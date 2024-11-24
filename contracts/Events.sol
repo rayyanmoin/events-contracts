@@ -8,11 +8,11 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 
-contract ChainConnect is ERC20, ERC20Burnable, ERC20Pausable, Ownable, ERC20Permit {
+contract Events is ERC20, ERC20Burnable, ERC20Pausable, Ownable, ERC20Permit {
     constructor(address initialOwner)
-        ERC20("ChainConnect", "CC")
+        ERC20("Events", "CC")
         Ownable(initialOwner)
-        ERC20Permit("ChainConnect")
+        ERC20Permit("Events")
     {}
 
     function pause() public onlyOwner {
