@@ -2,103 +2,44 @@
 // Compatible with OpenZeppelin Contracts ^5.0.0
 pragma solidity ^0.8.22;
 
-import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import {ERC721URIStorage} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {ERC20Pausable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract EventTicketing is ERC721, ERC721URIStorage, Ownable {
-    uint256 private _nextTokenId;
+contract Alpha is ERC20, ERC20Pausable, Ownable {
 
-    string private _baseURI;
+mapping(address => bool) public admins;
 
-    constructor(
-        address initialOwner
-    ) ERC721("Alpha", "Alp") Ownable(initialOwner) {}
+modifier onlyAdmin() {
+    require(admins[msg.sender], "Only admins can call this function");
+    _;
+}
 
-    function setBaseURI(string memory baseURI) external {
-        _baseURI = baseURI;
-    }
-  
-    function ticketsOf(address owner) public view returns (uint256[] memory) {
-        uint256 _tokenCount = balanceOf(owner);
-
-        if (_tokenCount == 0) {
-            return new uint256[](0);
-        } else {
-            uint256[] memory result = new uint256[](_nextTokenId);
-            uint256 totalTickets = _nextTokenId;
-            uint256 index = 0;
-
-            uint256 ticketId;
-            for (ticketId = 1; ticketId <= totalTickets; ticketId++) {
-                if (ownerOf(ticketId) == owner) {
-                    result[index] = ticketId;
-                    index++;
-                }
-            }
-        }
-
-        return result;
-    }
-
-    function safeMint(address to, string memory uri) public onlyOwner {
-        uint256 tokenId = _nextTokenId++;
-        _safeMint(to, tokenId);
-        _setTokenURI(tokenId, uri);
-    }
-
-    function getTicket(uint256 _id)
-        public
-        view
-        returns (Ticket memory _ticket)
+    constructor(address initialOwner)
+        ERC20("Alpha", "ALP")
+        Ownable(initialOwner)
     {
-        require(
-            _id != 0 && _id <= tickets.length,
-            "DaoEvents:getTicket: Invalid ID"
-        );
-        return tickets[_id - 1];
+        admins[initialOwner] = true;
+    }
+
+    function pause() public onlyAdmin {
+        _pause();
+    }
+
+    function unpause() public onlyAdmin{
+        _unpause();
+    }
+
+    function mint(address to, uint256 amount) public onlyAdmin {
+        _mint(to, amount);
     }
 
     // The following functions are overrides required by Solidity.
 
-    function tokenURI(
-        uint256 tokenId
-    ) public view override(ERC721, ERC721URIStorage) returns (string memory) {
-        return super.tokenURI(tokenId);
+    function _update(address from, address to, uint256 value)
+        internal
+        override(ERC20, ERC20Pausable)
+    {
+        super._update(from, to, value);
     }
-
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view override(ERC721, ERC721URIStorage) returns (bool) {
-        return super.supportsInterface(interfaceId);
-    }
-
-    function _baseURI() internal view override returns (string memory) {
-        return _baseURI;
-    }
-
-
-
-    function uintToString(uint _i) internal pure returns (string memory _uintAsString) {
-        if (_i == 0) {
-            return "0";
-        }
-        uint j = _i;
-        uint len;
-        while (j != 0) {
-            len++;
-            j /= 10;
-        }
-        bytes memory bstr = new bytes(len);
-        uint k = len;
-        while (_i != 0) {
-            k = k-1;
-            uint8 temp = (48 + uint8(_i - _i / 10 * 10));
-            bytes1 b1 = bytes1(temp);
-            bstr[k] = b1;
-            _i /= 10;
-        }
-        return string(bstr);
-    }
-
 }
