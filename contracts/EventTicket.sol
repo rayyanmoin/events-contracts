@@ -5,11 +5,11 @@ pragma solidity ^0.8.22;
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {ERC721URIStorage} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {Ticket} from "./IEvents.sol";
+import "./IEvents.sol";
 
 contract EventTicketing is ERC721, ERC721URIStorage, Ownable {
 
-    Ticket[] public tickets;
+    IEvents.Ticket[] public tickets;
 
     uint256 private _nextTokenId;
 
@@ -64,7 +64,7 @@ contract EventTicketing is ERC721, ERC721URIStorage, Ownable {
 
     function getTicket(
         uint256 _id
-    ) public view returns (Ticket memory _ticket) {
+    ) public view returns (IEvents.Ticket memory _ticket) {
         require(
             _id != 0 && _id <= tickets.length,
             "DaoEvents:getTicket: Invalid ID"
