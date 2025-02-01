@@ -13,13 +13,13 @@ interface IERC20 {
 contract Oracle is IOracle {
     using FixedPoint for *;
 
-    address public constant WMATIC = address(0);
     address public constant ALPHA = address(0);
-    address public constant WETH = address(0);
-    address public constant USDC = address(0);
-    address public constant USDT = address(0);
+    address public constant WETH = 0x7507c1dc16935B82698e4C63f2746A2fCf994dF8;
+    address public constant USDC = 0xd6D83aF58a19Cd14eF3CF6fe848C9A4d21e5727c;
+    address public constant USDT = 0x0E4aaF1351de4c0264C5c7056Ef3777b41BD8e03; // HONEY stable coin
 
-    address public constant UNISWAP_V2_FACTORY = address(0);
+    address public constant UNISWAP_V2_FACTORY =
+        0xb08Bfed214ba87d5d5D07B7DA573010016C44488;
 
     IUniswapV2Factory factoryInterface;
     mapping(address => uint256) public commulativeAveragePrice;
@@ -37,9 +37,9 @@ contract Oracle is IOracle {
     }
 
     function setValues(address token) public {
-        address pool = factoryInterface.getPair(WMATIC, token);
+        address pool = factoryInterface.getPair(WETH, token);
         if (pool != address(0)) {
-            if (WMATIC < token) {
+            if (WETH < token) {
                 (
                     commulativeETHPrice[token],
                     commulativeAveragePrice[token],
@@ -77,7 +77,7 @@ contract Oracle is IOracle {
         uint256 ethPerUSDT = _getAmount(USDT);
         emit AssetValue(ethPerUSDT, block.timestamp);
 
-        if (token == WMATIC) {
+        if (token == WETH) {
             price = ethPerUSDT;
             emit AssetValue(ethPerUSDT, block.timestamp);
             emit AssetValue(price, block.timestamp);
@@ -121,7 +121,7 @@ contract Oracle is IOracle {
     function _getAmount(
         address token
     ) internal view returns (uint256 ethPerToken) {
-        address poolAddress = factoryInterface.getPair(WMATIC, token);
+        address poolAddress = factoryInterface.getPair(WETH, token);
         if (poolAddress == address(0)) {
             return 0;
         }

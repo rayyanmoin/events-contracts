@@ -17,11 +17,9 @@ interface IERC20 {
 }
 
 contract Event is IEvents, ReentrancyGuard, EventTicket {
-    constructor(address initialOwner) EventTicket(initialOwner) {}
-
     IOracle public oracle;
     address public alphaAddress;
-    address private adminAddress = 0x0000000000000000000000000000000000000000;
+    address private adminAddress;
 
     mapping(uint256 => Event) public events;
     mapping(address => uint256[]) public ownedEvents;
@@ -30,6 +28,10 @@ contract Event is IEvents, ReentrancyGuard, EventTicket {
     mapping(uint8 => WhiteListedToken) public whiteListedTokens;
     uint8 public tokensLength;
     uint256 public eventId;
+
+    constructor(address initialOwner) EventTicket(initialOwner) {
+        adminAddress = initialOwner;
+    }
 
     modifier onlyEventOwner(uint256 _eventId) {
         require(events[_eventId].owner == msg.sender, "Not the event owner");
