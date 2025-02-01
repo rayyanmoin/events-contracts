@@ -6,12 +6,12 @@ import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {ERC721URIStorage} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import "./IEvents.sol";
+import "./Event.sol";
 
-contract EventTicketing is ERC721, ERC721URIStorage, Ownable {
-
+contract EventTicket is ERC721, ERC721URIStorage, Ownable {
     IEvents.Ticket[] public tickets;
 
-    uint256 private _nextTokenId;
+    uint256 public nextTokenId;
 
     string public baseURI;
 
@@ -24,7 +24,7 @@ contract EventTicketing is ERC721, ERC721URIStorage, Ownable {
     }
 
     function _safeMint(address to, string memory uri) internal {
-        uint256 tokenId = _nextTokenId++;
+        uint256 tokenId = nextTokenId++;
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
     }
@@ -47,8 +47,8 @@ contract EventTicketing is ERC721, ERC721URIStorage, Ownable {
         if (_tokenCount == 0) {
             return new uint256[](0);
         } else {
-            uint256[] memory result = new uint256[](_nextTokenId);
-            uint256 totalTickets = _nextTokenId;
+            uint256[] memory result = new uint256[](nextTokenId);
+            uint256 totalTickets = nextTokenId;
             uint256 index = 0;
 
             uint256 ticketId;

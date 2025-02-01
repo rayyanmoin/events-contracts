@@ -7,26 +7,28 @@ import {ERC20Pausable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC2
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Alpha is ERC20, ERC20Pausable, Ownable {
-
-mapping(address => bool) public admins;
-
-modifier onlyAdmin() {
-    require(admins[msg.sender], "Only admins can call this function");
-    _;
-}
-
-    constructor(address initialOwner)
-        ERC20("Alpha", "ALP")
-        Ownable(initialOwner)
-    {
+    constructor(
+        address initialOwner
+    ) ERC20("Alpha", "ALPHA") Ownable(initialOwner) {
         admins[initialOwner] = true;
+    }
+
+    mapping(address => bool) private admins;
+
+    modifier onlyAdmin() {
+        require(admins[msg.sender]);
+        _;
+    }
+
+    function setOnlyAdmin(address _onlyAdmin) public onlyOwner {
+        admins[_onlyAdmin] = true;
     }
 
     function pause() public onlyAdmin {
         _pause();
     }
 
-    function unpause() public onlyAdmin{
+    function unpause() public onlyAdmin {
         _unpause();
     }
 
@@ -36,10 +38,11 @@ modifier onlyAdmin() {
 
     // The following functions are overrides required by Solidity.
 
-    function _update(address from, address to, uint256 value)
-        internal
-        override(ERC20, ERC20Pausable)
-    {
+    function _update(
+        address from,
+        address to,
+        uint256 value
+    ) internal override(ERC20, ERC20Pausable) {
         super._update(from, to, value);
     }
 }
